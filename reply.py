@@ -146,10 +146,9 @@ def main():
             replies.append(neighbors[0])
             graph.grid[c[0]][c[1]] = 'R'
 
-    for customer in customers:
+    for customer in tqdm.tqdm(customers):
         for reply in replies:
             path = dijkstra(graph, reply, customer[0:2])
-            print(reply[0], reply[1], path_to_str(path))
             output.write(f'{reply[0]} {reply[1]} {path_to_str(path)}\n')
 
 
