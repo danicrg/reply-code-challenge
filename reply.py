@@ -39,8 +39,8 @@ class PriorityQueue:
 class Grid:
     def __init__(self, grid):
         self.grid = np.array(grid)
-        self.width = self.grid.shape[1]
         self.height = self.grid.shape[0]
+        self.width = self.grid.shape[1]
 
     def in_bounds(self, id):
         (x, y) = id
@@ -96,7 +96,7 @@ def dijkstra(graph, start, goal):
             break
 
         for next in graph.neighbors(current):
-            value = graph.grid[next[0]][next[1]]
+            value = graph.grid[next[0], next[1]]
             if (value == 'C' or value == 'R') and next != goal:
                 continue
             new_cost = cost_so_far[current] + graph.cost(next)
@@ -124,8 +124,8 @@ def main():
     print(n, m, c, r)
     customers = []
     for _ in range(c):
-        x, y, reward = list(map(int, f.readline().rsplit()))
-        customers.append((y, x, reward))
+        y, x, reward = list(map(int, f.readline().rsplit()))
+        customers.append((x, y, reward))
 
     matrix = []
 
@@ -134,27 +134,34 @@ def main():
     graph = Grid(matrix)
 
     for c in customers:
-        graph.grid[c[0]][c[1]] = 'C'
+        graph.grid[c[0], c[1]] = 'C'
 
     customers = sorted(customers, key=lambda x: x[2], reverse=True)
-    print(customers)
     replies = []
     for i in range(0, r):
         neighbors = graph.neighbors(customers[i][0:2])
         if len(neighbors) > 0:
             neighbors = [n for n in neighbors if graph.grid[n[0]][n[1]] != 'C' and graph.grid[n[0]][n[1]] != 'R']
             replies.append(neighbors[0])
-            graph.grid[c[0]][c[1]] = 'R'
+            graph.grid[c[0], c[1]] = 'R'
+            reply = neighbors[0]
+            path = dijkstra(graph, reply, customers[i][0:2])
+            output.write(f'{reply[1]} {reply[0]} {path_to_str(path)}\n')
 
-    for customer in tqdm.tqdm(customers):
-        for reply in replies:
-            path = dijkstra(graph, reply, customer[0:2])
-            output.write(f'{reply[0]} {reply[1]} {path_to_str(path)}\n')
+    # for customer in tqdm.tqdm(customers):
+    #     for reply in replies:
+    #         path = dijkstra(graph, reply, customer[0:2])
+    #         output.write(f'{reply[0]} {reply[1]} {path_to_str(path)}\n')
 
 
 if __name__ == '__main__':
-    inputs = ['2_himalayas', '4_manhattan', '1_victoria_lake', '3_budapest', '5_oceania']
+    inputs = ['1_victoria_lake', '2_himalayas', '4_manhattan', '3_budapest', '5_oceania']
     for i in inputs:
         f = open(i + '.txt', 'r')
         output = open(i + '.out', 'w')
         main()
+        output.close()
+    # f = open('example.txt', 'r')
+    # output = open('example.out.txt', 'w')
+    main()
+    print('Complete')
